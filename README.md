@@ -11,5 +11,3 @@ Each project has its own branch. Take a look at the branches under this reposito
 3 - Liquor store analysis using Advanced Excel techniques
 ###### 
 4 - VLC Media Player software testing 
-###### 
-5 - Syllabus Archive
