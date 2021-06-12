@@ -6,7 +6,7 @@ Each project has its own branch. Take a look at the branches under this reposito
 ## Projects
 1 - Titanic analysis with R
 ###### 
-2 - Used cars analysis with Python
+2 - Diabetes analysis with Python
 ###### 
 3 - Liquor store analysis using Advanced Excel techniques
 ###### 
