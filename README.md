@@ -1,7 +1,7 @@
 # My-Projects
 This repository contains the variety of projects I have done. 
 
-# Projects
+## Projects
 1 - Titanic analysis with R
 2 - Used cars analysis with Python
 3 - Liquor store analysis using Advanced Excel techniques
