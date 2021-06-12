@@ -10,8 +10,6 @@ Each project has its own branch. Take a look at the branches under this reposito
 ###### 
 3 - Liquor store analysis using Advanced Excel techniques
 ###### 
-4 - Feed Forward Database using SQL Server Management Studios
+4 - VLC Media Player software testing 
 ###### 
-5 - VLC Media Player software testing 
-###### 
-6 - Syllabus Archive
+5 - Syllabus Archive
