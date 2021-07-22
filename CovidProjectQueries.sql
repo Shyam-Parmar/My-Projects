@@ -1,3 +1,14 @@
+/*
+
+Date Dataset Was Latest Updated
+07/20/2021
+
+Date Analyzed 
+07/22/2021
+
+*/
+
+
 /* 
 
 Queries used for COVID-19 Data Analysis and Visualization done in Tableau
