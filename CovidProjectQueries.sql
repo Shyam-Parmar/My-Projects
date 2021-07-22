@@ -76,15 +76,8 @@ Queries originally written
 */
 
 
+
 -- 1.
--- Selecting the data I will be using and sorting by location, then date ascending 
-SELECT location, date, total_cases, new_cases, total_deaths, population
-FROM CovidProject..CovidDeaths
-WHERE continent is not null
-ORDER BY 1,2
-
-
--- 2.
 -- Looking at Total Cases vs Total Deaths
 -- Shows the percentage of Deaths from COVID
 SELECT location, date, total_cases, total_deaths, ROUND((total_deaths / total_cases)*100,2) as 'Death %'
@@ -92,7 +85,7 @@ FROM CovidProject..CovidDeaths
 ORDER BY 1,2
 
 
--- 3.
+-- 2.
 -- Looking at Total Cases vs Population
 -- Shows what percentage of population got COVID
 SELECT location, date, total_cases, population, ROUND((total_cases/ population)*100,2) as 'Cases %'
@@ -100,7 +93,7 @@ FROM CovidProject..CovidDeaths
 ORDER BY 1,2
 
 
--- 4.
+-- 3.
 -- Looking at countries with the Highest Cases by Population
 SELECT location, population, MAX(total_cases) as 'Total Cases', MAX(ROUND((total_cases/ population)*100,2)) as 'Case Percentage'
 FROM CovidProject..CovidDeaths
@@ -108,7 +101,7 @@ GROUP BY population, location
 ORDER BY 'Case Percentage' DESC
 
 
--- 5.
+-- 4.
 -- Showing countries with Highest Death Count by population
 SELECT location, population, MAX(CAST(total_deaths as int)) as 'Total Death Count'
 FROM CovidProject..CovidDeaths
@@ -117,7 +110,7 @@ GROUP BY location, population
 ORDER BY 'Total Death Count' DESC
 
 
--- 6.
+-- 5.
 -- CONTINENT
 -- Showing continent with the Highest Death Count by population
 -- This query shows the actual results
@@ -135,7 +128,7 @@ GROUP BY continent
 ORDER BY 'Total Death Count' DESC
 
 
--- 7.
+-- 6.
 -- GLOBAL NUMBERS
 -- Included with date
 SELECT date, SUM(new_cases) as 'Total Cases', SUM(CAST(new_deaths AS INT)) as 'Total Deaths', ROUND((SUM(CAST(new_deaths AS INT))/SUM(new_cases))*100,2) as 'Death %'
@@ -150,8 +143,16 @@ SELECT SUM(new_cases) as 'Total Cases', SUM(CAST(new_deaths AS INT)) as 'Total D
 FROM CovidProject..CovidDeaths
 WHERE continent is not null
 
--- 8.
+-- 7.
 -- Vaccinations
+-- Looking at the countries that have the Highest Vaccinations
+SELECT location, MAX(CAST(new_vaccinations as int)) as 'Total Vaccines'
+FROM CovidProject..CovidVaccinations
+WHERE continent is not null
+GROUP BY location
+ORDER BY 'Total Vaccines' DESC
+
+-- 8.
 -- Looking at Total Population vs Vaccinations
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
 	SUM(CONVERT(INT,vac.new_vaccinations)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date)
