@@ -9,12 +9,7 @@ Date Analyzed
 */
 
 
-/* 
-
-Queries used for COVID-19 Data Analysis and Visualization done in Tableau
-
-*/
-
+-- Queries used for COVID-19 Data Analysis and Visualization done in Tableau
 
 
 -- 1.
@@ -66,16 +61,7 @@ ORDER BY 'Case Percentage' DESC
 
 
 
-
-
-
-/*
-
-Queries originally written
-
-*/
-
-
+-- Queries originally written
 
 -- 1.
 -- Looking at Total Cases vs Total Deaths
