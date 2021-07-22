@@ -9,6 +9,10 @@ Date Analyzed
 */
 
 
+
+
+
+
 -- Queries used for COVID-19 Data Analysis and Visualization done in Tableau
 
 
