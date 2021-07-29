@@ -9,89 +9,119 @@ Date Analyzed
 */
 
 
-
-
-
-
 -- Queries used for COVID-19 Data Analysis and Visualization done in Tableau
 
 
 -- 1.
--- Overall Global Numbers
--- Total cases, deaths, and death percentage globally
-SELECT SUM(new_cases) as 'Total Cases', SUM(CAST(new_deaths AS INT)) as 'Total Deaths', SUM(CAST(new_deaths AS INT))/SUM(new_cases)*100 as 'Death Percentage'
-FROM CovidProject..CovidDeaths
-WHERE continent is not null
-ORDER BY 1,2
-
+-- OVERALL GLOBAL NUMBERS
+-- Population, cases, deaths, death%, vaccines, vaccine %
+SELECT SUM(dea.population) AS 'Population', 
+SUM(dea.new_cases) AS 'Cases', 
+SUM(CAST(dea.new_deaths AS INT)) AS 'Deaths',
+SUM(CAST(dea.new_deaths AS INT))/SUM(dea.new_cases)*100 AS 'Death %',
+SUM(CONVERT(FLOAT, vac.new_vaccinations)) AS 'Population Vaccinated',
+SUM(CAST(vac.new_vaccinations as float))/SUM(dea.population)*100 AS 'Vaccination %'
+FROM CovidProject..CovidVaccinations vac
+JOIN CovidProject..CovidDeaths dea
+ON vac.location = dea.location 
+AND vac.date = dea.date
+WHERE dea.continent IS NOT NULL
 
 -- Double checking the data since the numbers are extremely close
 -- The second one includes "International Locations"
-
---SELECT SUM(new_cases) as 'Total Cases', SUM(CAST(new_deaths AS INT)) as 'Total Deaths', SUM(CAST(new_deaths AS INT))/SUM(new_cases)*100 as 'Death Percentage'
---FROM CovidProject..CovidDeaths
---WHERE location = 'World'
---ORDER BY 1,2
-
+-- SELECT SUM(new_cases) as 'Total Cases', SUM(CAST(new_deaths AS INT)) as 'Total Deaths', SUM(CAST(new_deaths AS INT))/SUM(new_cases)*100 as 'Death Percentage'
+-- FROM CovidProject..CovidDeaths
+-- WHERE location = 'World'
+-- ORDER BY 1,2
 
 
 -- 2.
--- Taking these out as they are not included in the above queries
--- European Union is part of Europe
+-- NUMBER OF CASES
+-- Total Cases Per Continent
+-- Bar Chart
+SELECT location, MAX(total_cases) AS 'Cases'
+FROM CovidProject..CovidDeaths
+WHERE continent IS NULL
+	AND location NOT IN ('World', 'European Union', 'International')
+GROUP BY location
+ORDER BY 1,2
+
+
+-- Total Cases Per Continent With Date
+-- Line Chart
+SELECT location, date, MAX(total_cases) AS 'Cases'
+FROM CovidProject..CovidDeaths
+WHERE continent IS NULL
+	AND location NOT IN ('World', 'European Union', 'International')
+GROUP BY location, date
+ORDER BY 1,2
+
+-- 3.
+-- NUMBER OF DEATHS
+-- Death Count Per Continent
+-- Bar Chart
 SELECT location, SUM(CAST(new_deaths AS INT)) as 'Total Death Count'
 FROM CovidProject..CovidDeaths
-WHERE continent is null
+WHERE continent IS NULL
 	AND location NOT IN ('World', 'European Union', 'International')
 GROUP BY location
 ORDER BY 'Total Death Count' DESC
 
+-- Line Graph
+SELECT location, date, SUM(CAST(new_deaths AS INT)) as 'Total Death Count'
+FROM CovidProject..CovidDeaths
+WHERE continent IS NULL
+	AND location NOT IN ('World', 'European Union', 'International')
+GROUP BY location, date
+ORDER BY 'Total Death Count' DESC
 
+-- 4. 
+-- NUMBER OF VACCINES
+-- Continents Vaccinated
+-- Bar Chart
+SELECT continent, MAX(CAST(new_vaccinations as int)) as 'Total Vaccines'
+FROM CovidProject..CovidVaccinations
+WHERE continent IS NOT NULL
+GROUP BY continent
+ORDER BY 'Total Vaccines' DESC
 
--- 3.
--- Looking at countries with the Highest Cases by Population
-SELECT location, population, MAX(total_cases) as 'Total Cases', MAX(ROUND((total_cases/ population)*100,2)) as 'Case Percentage'
+-- Continents Vaccinated
+-- Line Chart
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
+	SUM(CONVERT(INT,vac.new_vaccinations)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date)
+	as 'Rolling People Vaccinated'
+FROM CovidProject..CovidDeaths dea
+JOIN CovidProject..CovidVaccinations vac
+ON dea.location = vac.location
+AND dea.date = vac.date
+WHERE dea.continent IS NOT NULL
+ORDER BY 2,3
+
+-- 5.
+-- MAP
+SELECT location, population, MAX(total_cases) AS 'Total Cases', MAX(ROUND((total_cases/ population)*100,2)) AS 'Case %'
 FROM CovidProject..CovidDeaths
 GROUP BY population, location
-ORDER BY 'Case Percentage' DESC
+ORDER BY 'Case %' DESC
 
-
-
--- 4.
--- Same query as number 3, this one however includes the Date
-SELECT location, population, date, MAX(total_cases) as 'Total Cases', MAX(ROUND((total_cases/ population)*100,2)) as 'Case Percentage'
-FROM CovidProject..CovidDeaths
-GROUP BY population, location, date
-ORDER BY 'Case Percentage' DESC
-
-
-
--- Queries originally written
+-- Queries Originally Written
 
 -- 1.
--- Looking at Total Cases vs Total Deaths
--- Shows the percentage of Deaths from COVID
-SELECT location, date, total_cases, total_deaths, ROUND((total_deaths / total_cases)*100,2) as 'Death %'
+-- CASES
+-- Understanding the number of cases and population for each country and continent
+-- Shows the number of cases received from each country overtime
+SELECT location, date, total_cases, population, ROUND((total_cases/ population)*100,2) AS 'Cases %'
 FROM CovidProject..CovidDeaths
 ORDER BY 1,2
 
-
--- 2.
--- Looking at Total Cases vs Population
--- Shows what percentage of population got COVID
-SELECT location, date, total_cases, population, ROUND((total_cases/ population)*100,2) as 'Cases %'
-FROM CovidProject..CovidDeaths
-ORDER BY 1,2
-
-
--- 3.
--- Looking at countries with the Highest Cases by Population
-SELECT location, population, MAX(total_cases) as 'Total Cases', MAX(ROUND((total_cases/ population)*100,2)) as 'Case Percentage'
+-- Shows countries with the total highest cases,
+SELECT location, population, MAX(total_cases) AS 'Total Cases', MAX(ROUND((total_cases/ population)*100,2)) AS 'Case %'
 FROM CovidProject..CovidDeaths
 GROUP BY population, location
-ORDER BY 'Case Percentage' DESC
+ORDER BY 'Case %' DESC
 
-
--- 4.
+--2. 
+-- DEATHS
 -- Showing countries with Highest Death Count by population
 SELECT location, population, MAX(CAST(total_deaths as int)) as 'Total Death Count'
 FROM CovidProject..CovidDeaths
@@ -99,8 +129,7 @@ WHERE continent is not null
 GROUP BY location, population
 ORDER BY 'Total Death Count' DESC
 
-
--- 5.
+-- 3.
 -- CONTINENT
 -- Showing continent with the Highest Death Count by population
 -- This query shows the actual results
@@ -117,33 +146,30 @@ WHERE continent is not null
 GROUP BY continent
 ORDER BY 'Total Death Count' DESC
 
-
--- 6.
+-- 4.
 -- GLOBAL NUMBERS
--- Included with date
+-- Cases, and Deaths each day
 SELECT date, SUM(new_cases) as 'Total Cases', SUM(CAST(new_deaths AS INT)) as 'Total Deaths', ROUND((SUM(CAST(new_deaths AS INT))/SUM(new_cases))*100,2) as 'Death %'
 FROM CovidProject..CovidDeaths
 WHERE continent is not null
 GROUP BY date
 ORDER BY 1,2
 
--- Same query as above, just removed the Date
--- Overall global numbers
-SELECT SUM(new_cases) as 'Total Cases', SUM(CAST(new_deaths AS INT)) as 'Total Deaths', ROUND((SUM(CAST(new_deaths AS INT))/SUM(new_cases))*100,2) as 'Death %'
-FROM CovidProject..CovidDeaths
-WHERE continent is not null
+-- Population, cases, deaths, death%, vaccines, vaccine %
+SELECT SUM(dea.population) AS 'Population', 
+SUM(dea.new_cases) AS 'Cases', 
+SUM(CAST(dea.new_deaths AS INT)) AS 'Deaths',
+SUM(CAST(dea.new_deaths AS INT))/SUM(dea.new_cases)*100 AS 'Death %',
+SUM(CONVERT(FLOAT, vac.new_vaccinations)) AS 'Population Vaccinated',
+SUM(CAST(vac.new_vaccinations as float))/SUM(dea.population)*100 AS 'Vaccination %'
+FROM CovidProject..CovidVaccinations vac
+JOIN CovidProject..CovidDeaths dea
+ON vac.location = dea.location 
+AND vac.date = dea.date
+WHERE dea.continent IS NOT NULL
 
--- 7.
--- Vaccinations
--- Looking at the countries that have the Highest Vaccinations
-SELECT location, MAX(CAST(new_vaccinations as int)) as 'Total Vaccines'
-FROM CovidProject..CovidVaccinations
-WHERE continent is not null
-GROUP BY location
-ORDER BY 'Total Vaccines' DESC
-
--- 8.
--- Looking at Total Population vs Vaccinations
+-- 5.
+-- Looking at Total Population vs Vaccinations each day
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
 	SUM(CONVERT(INT,vac.new_vaccinations)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date)
 	as 'Rolling People Vaccinated'
@@ -154,8 +180,7 @@ AND dea.date = vac.date
 WHERE dea.continent is not null	
 ORDER BY 2,3
 
-
--- 9.
+-- 6.
 -- Using a CTE
 WITH PopVsVac (continent, location, date, population, new_vaccinations, RollingPeopleVaccinated)
 AS
@@ -174,7 +199,7 @@ SELECT *, (RollingPeopleVaccinated/population)*100 as 'Rolling Vaccination %'
 FROM PopVsVac
 
 
--- 10.
+-- 7.
 -- Using a TEMP TABLE
 DROP TABLE IF EXISTS #PercentPopulationVaccinated
 CREATE TABLE #PercentPopulationVaccinated
@@ -200,7 +225,7 @@ SELECT *, (RollingPeopleVaccinated/population)*100 as 'Rolling Vaccination %'
 FROM #PercentPopulationVaccinated
 
 
--- 11.
+-- 8.
 -- Creating Views to store data for later visualizations
 CREATE VIEW PercentPopulationVaccinated
 AS
