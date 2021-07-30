@@ -15,17 +15,18 @@ Date Analyzed
 -- 1.
 -- OVERALL GLOBAL NUMBERS
 -- Population, cases, deaths, death%, vaccines, vaccine %
-SELECT SUM(dea.population) AS 'Population', 
+SELECT SUM(distinct dea.population) AS 'World Population', 
 SUM(dea.new_cases) AS 'Cases', 
 SUM(CAST(dea.new_deaths AS INT)) AS 'Deaths',
 SUM(CAST(dea.new_deaths AS INT))/SUM(dea.new_cases)*100 AS 'Death %',
-SUM(CONVERT(FLOAT, vac.new_vaccinations)) AS 'Population Vaccinated',
-SUM(CAST(vac.new_vaccinations as float))/SUM(dea.population)*100 AS 'Vaccination %'
+SUM(CONVERT(FLOAT, vac.new_vaccinations)) AS 'Vaccinations',
+SUM(CAST(vac.new_vaccinations AS FLOAT))/SUM(dea.population)*100 AS 'Vaccination %'
 FROM CovidProject..CovidVaccinations vac
 JOIN CovidProject..CovidDeaths dea
 ON vac.location = dea.location 
 AND vac.date = dea.date
 WHERE dea.continent IS NOT NULL
+
 
 -- Double checking the data since the numbers are extremely close
 -- The second one includes "International Locations"
@@ -38,55 +39,26 @@ WHERE dea.continent IS NOT NULL
 -- 2.
 -- NUMBER OF CASES
 -- Total Cases Per Continent
--- Bar Chart
-SELECT location, MAX(total_cases) AS 'Cases'
+SELECT continent, location, date, MAX(total_cases) AS 'Cases'
 FROM CovidProject..CovidDeaths
-WHERE continent IS NULL
+WHERE continent IS not NULL
 	AND location NOT IN ('World', 'European Union', 'International')
-GROUP BY location
-ORDER BY 1,2
-
-
--- Total Cases Per Continent With Date
--- Line Chart
-SELECT location, date, MAX(total_cases) AS 'Cases'
-FROM CovidProject..CovidDeaths
-WHERE continent IS NULL
-	AND location NOT IN ('World', 'European Union', 'International')
-GROUP BY location, date
+GROUP BY location, date, continent
 ORDER BY 1,2
 
 -- 3.
 -- NUMBER OF DEATHS
 -- Death Count Per Continent
--- Bar Chart
-SELECT location, SUM(CAST(new_deaths AS INT)) as 'Total Death Count'
+SELECT continent, location, date, SUM(CAST(new_deaths AS INT)) as 'Total Death Count'
 FROM CovidProject..CovidDeaths
-WHERE continent IS NULL
+WHERE continent IS not NULL
 	AND location NOT IN ('World', 'European Union', 'International')
-GROUP BY location
-ORDER BY 'Total Death Count' DESC
-
--- Line Graph
-SELECT location, date, SUM(CAST(new_deaths AS INT)) as 'Total Death Count'
-FROM CovidProject..CovidDeaths
-WHERE continent IS NULL
-	AND location NOT IN ('World', 'European Union', 'International')
-GROUP BY location, date
+GROUP BY location, date, continent
 ORDER BY 'Total Death Count' DESC
 
 -- 4. 
 -- NUMBER OF VACCINES
 -- Continents Vaccinated
--- Bar Chart
-SELECT continent, MAX(CAST(new_vaccinations as int)) as 'Total Vaccines'
-FROM CovidProject..CovidVaccinations
-WHERE continent IS NOT NULL
-GROUP BY continent
-ORDER BY 'Total Vaccines' DESC
-
--- Continents Vaccinated
--- Line Chart
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
 	SUM(CONVERT(INT,vac.new_vaccinations)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date)
 	as 'Rolling People Vaccinated'
