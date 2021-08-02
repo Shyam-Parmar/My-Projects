@@ -20,7 +20,7 @@ SUM(dea.new_cases) AS 'Cases',
 SUM(CAST(dea.new_deaths AS INT)) AS 'Deaths',
 SUM(CAST(dea.new_deaths AS INT))/SUM(dea.new_cases)*100 AS 'Death %',
 SUM(CONVERT(FLOAT, vac.new_vaccinations)) AS 'Vaccinations',
-SUM(CAST(vac.new_vaccinations AS FLOAT))/SUM(dea.population)*100 AS 'Vaccination %'
+SUM(CAST(vac.new_vaccinations AS FLOAT))/SUM(distinct dea.population)*100 AS 'Vaccination %'
 FROM CovidProject..CovidVaccinations vac
 JOIN CovidProject..CovidDeaths dea
 ON vac.location = dea.location 
