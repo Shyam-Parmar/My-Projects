@@ -39,11 +39,19 @@ WHERE dea.continent IS NOT NULL
 -- 2.
 -- NUMBER OF CASES
 -- Total Cases Per Continent
-SELECT continent, location, date, MAX(total_cases) AS 'Cases'
+SELECT continent, location, date, Sum(new_cases) AS 'Cases'
 FROM CovidProject..CovidDeaths
 WHERE continent IS not NULL
 	AND location NOT IN ('World', 'European Union', 'International')
 GROUP BY location, date, continent
+ORDER BY 1,2
+
+-- Getting the maximum number of cases for each country of a continent
+SELECT continent, location, max(total_cases) as 'Cases'
+FROM CovidProject..CovidDeaths
+WHERE continent IS not NULL
+	AND location NOT IN ('World', 'European Union', 'International')
+GROUP BY location, continent
 ORDER BY 1,2
 
 -- 3.
