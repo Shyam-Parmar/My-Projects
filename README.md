@@ -1,13 +1,4 @@
-# My_Projects
-This repository contains the variety of projects I have done. 
-####
-Each project has its own branch. Take a look at the branches under this repository.
+# Housing Data Cleaning
+## Data Cleaning Using SQL
+Utilizing SQL Server to perform data cleaning on a housing dataset. I have used a variety of different SQL Query methods, such as Join Statements, various functions, and formulas, and CTEs that aid in cleaning the data more effeciently.
 
-## Projects
-1 - COVID-19 Data Exploration
-###### 
-2 - Titanic analysis with R
-###### 
-3 - Diabetes analysis with Python
-###### 
-4 - Liquor store analysis using Advanced Excel techniques
