@@ -1,17 +1,7 @@
-# My_Projects
-This repository contains the variety of projects I have done. 
-####
-Each project has its own branch. Take a look at the branches under this repository.
+# Movie Correlation
+## Finding Corerlation
+Utilizing Python language to find correlations of the fields found in a movie dataset. 
 
-## Projects
-1 - COVID-19 Data Exploration w/ SQL
-###### 
-2 - Titanic analysis w/ R
-###### 
-3 - Diabetes analysis w/ Python
-###### 
-4 - Housing Data Cleaning w/ SQL
-###### 
-5 - Movie Correlation w/ Python 
-###### 
-6 - Liquor store analysis using Advanced Excel techniques
+Hypothesis was Budget has a high correlation to Gross which was correct.
+Hypothesis was Company has a high correlation to Gross which was incorrect.
+New findings were that Votes have a high correlation to Budget and Gross.
